@@ -3,4 +3,5 @@ __pycache__/
 .vscode/
 .DS_Store
 db.sqlite3
-migrations/*
+**/migrations/*.py
+!**/magrations/__init__.py
