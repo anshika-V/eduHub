@@ -4,4 +4,4 @@ __pycache__/
 .DS_Store
 db.sqlite3
 **/migrations/*.py
-!**/magrations/__init__.py
+!**/migrations/__init__.py
