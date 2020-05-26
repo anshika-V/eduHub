@@ -19,7 +19,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(
-        default='users/profile_pic/default.jpg', upload_to='users/profile_pic')
+        default='user/profile_pic/default.jpg', upload_to='user/profile_pic')
     DOB = models.DateField(blank='true', null='true')
     email_verified = models.IntegerField(
         choices=Email_Verification.choices, default=0)

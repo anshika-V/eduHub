@@ -1,0 +1,39 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block stylesheet%}
+	<link rel="stylesheet" href={%static 'user/login.css'%} />
+{% endblock stylesheet %}
+{% block body %}
+<div id="divForm">
+	<form method="POST" id="login-form" class="content-section bg-light">
+		<fieldset class="form-group" style="margin-bottom: 0">
+		<label >
+			<h1 class="display-2" style="margin-top: 1vh;">Log In</h1>
+			<br/>
+			<h5 class="text-secondary" style="margin-top: -1vh">Please LogIn to continue</h5>
+			{% if error_msg %}
+			<div class="alert-danger form-control mb-2" style="height: auto; width: auto;">
+			<strong>Unauthorised Access:</strong>{{error_msg}}<br />
+			<a class="text-danger" href = {%if type == 'I'%} {% url 'instructor login' %} {% else %} {% url 'student login' %} {% endif%}> click here</a>
+			</div>
+			{% endif %}
+		</label>
+		<br/>
+		{%csrf_token%}
+		{{form.as_p}}
+		</fieldset>
+		<button type = "submit" class="btn btn-primary" id="submit">LogIn</button>
+		<p style="padding-bottom: 0;  margin-bottom: 0;">
+		<small class="font-weight-light" style="margin-right: 0.5vw;">Forget Password  </small>
+		<a href="#">click here</a></p>
+		<p style="padding-bottom: 0.5vh;">
+		<small class="font-weight-light" style="margin-right: 0.5vw;">Create Account  </small>
+		<a href="#">click here</a>
+		</p>
+		</form>
+</div>	
+{% endblock body %}
+
+
+
+

@@ -1,0 +1,40 @@
+#divForm {
+	width: 40vw;
+}
+
+#dp-cont {
+	float: right;
+	width: 165px;
+	overflow: hidden;
+}
+#dp {
+	margin: auto;
+	display: block;
+	height: 160px;
+	width: 160px;
+	padding: 2px;
+	border-radius: 2%;
+	border: 1px solid black;
+}
+#upload-btn {
+	width: 98%;
+	height: 25px;
+	transition: 0.25s;
+}
+
+#upload-btn:hover {
+	color: white;
+}
+@media only screen and (max-width: 800px) {
+	#divForm {
+		width: max(220px, 50vw);
+	}
+	#dp-cont {
+		float: none;
+		margin: auto;
+		margin-bottom: 16px;
+	}
+	input {
+		min-width: 150px;
+	}
+}

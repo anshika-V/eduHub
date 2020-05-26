@@ -1,14 +1,12 @@
-{% extends "home/base.html" %}
+{% extends "user/base.html" %}
 {% load static %}
-{% block headSection%}
-	<link rel="stylesheet" href={%static 'user/register.css'%} />
-{% endblock headSection %}
-{% block content %}
-<div class="container-fluid" >
-	<h1 class="display-4" style="text-align: center; margin-top: 1vh">eduHub</h1>
-
-	<div class="bg-dark" id="divForm">
-		<form method="POST">
+{% block stylesheet%}
+	<link rel="stylesheet" href= {% static 'user/login.css' %} />
+	<link rel="stylesheet" href={%static 'user/registration.css'%} />
+{% endblock stylesheet %}
+{% block body %}
+	<div id="divForm">
+		<form class="content-section bg-light" method="POST">
 			<div style="text-align: center;">
 				<label>
 					<h2 class="display-4" style="margin-top: 1vh;">Sign Up</h2>
@@ -28,8 +26,7 @@
 			<p style="padding-bottom: 0.5vh; text-align: center;"><small class="font-weight-light" style="margin-right: 0.5vw;">Already have an accout </small><a href="#ß">click here</a></p>
 		</form>
 	</div>	
-</div>
-{% endblock content %}
+{% endblock body %}
 
 
 

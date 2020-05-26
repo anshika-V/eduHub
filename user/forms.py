@@ -1,8 +1,23 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 from .models import Profile
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Your Username'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Your Password'
+        })
+        self.fields['username'].label = ''
+        self.fields['password'].label = ''
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -35,10 +50,21 @@ class UserRegistrationForm(UserCreationForm):
             'class': 'form-control',
             'placeholder': 'Re-enter Password'
         })
-        self.fields['password2'].help_text = ''
 
 
 class ProfileForm(ModelForm):
     class Meta:
         model = Profile
         fields = ['profile_pic', 'DOB', 'type']
+        widgets = {
+            'DOB': forms.DateInput(attrs={'type': 'date', 'class': "date-picker", "style": "max-width: 200px;"})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['type'].widget.attrs.update({
+            'style': 'display: none'
+        })
+        self.fields['profile_pic'].widget.attrs.update({
+            'onchange': 'imageUpload(event)'
+        })

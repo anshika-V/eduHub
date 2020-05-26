@@ -1,0 +1,48 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block stylesheet%}
+	<link rel="stylesheet" href= {% static 'user/login.css' %} />
+	<link rel="stylesheet" href={%static 'user/registration.css'%} />
+	<link rel = "stylesheet" href= {% static 'user/new_profile.css' %} />
+{% endblock stylesheet %}
+{% block body %}
+	<div class="p-2" id="divForm" style="margin-bottom: 10vh; margin-top: 8vh;" >
+		<form class="content-section bg-light" method="POST" enctype="multipart/form-data">
+			<div style="text-align: center;">
+				<label>
+					<h2 class="display-4" style="margin-top: 1vh;">Profile</h2>
+					<br/>
+				</label>
+				<br/>
+			</div>
+
+			<fieldset class="form-group" style="padding-left: 1vw;">
+				{%csrf_token%}
+				<div id="dp-cont">
+				<img src= "{% get_media_prefix %}{{form.profile_pic.value}}" id="dp" />
+				<label class="btn btn-dark form-control material-icons p-0" id="upload-btn">publish
+				<span style="display: none;">{{form.profile_pic}}<span></label>
+				</div>
+				<div>
+				<p>{{form.DOB.label_tag}}
+				{{form.DOB}}</p>
+				<p class="text-muted" readonly>
+				{{form.type}}
+				</p>
+				<div> 
+			</fieldset>
+			<p style="text-align: center;">
+			<button type = "submit" class="btn btn-primary" style="font-size: 2.5vh; padding: 3px;">Submit</button></p>
+			</form>
+	</div>	
+<script>
+function imageUpload(){
+	console.log('image uploaded')
+	let dp = document.getElementById('dp')
+	dp.src = URL.createObjectURL(event.target.files[0])
+}
+</script>
+{% endblock body %}
+
+
+
