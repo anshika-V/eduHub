@@ -25,7 +25,7 @@ SECRET_KEY = '%_2x5(!4-gk%m4$4-m!&88y-d#d7_d9@)$dl7uqdzf%dd+u3q1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user',
     'home',
     'material',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'eduHub.wsgi.application'
+ASGI_APPLICATION = "eduHub.routing.application"
 
 
 # Database
