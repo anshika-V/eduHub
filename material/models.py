@@ -13,7 +13,7 @@ class Test(models.Model):
 class Question(models.Model):
     class typeChoice(models.TextChoices):
         descriptive = 'D', _("Descriptive")
-        oneOprion = 'O', _('One_Option_Correct')
+        oneOption = 'O', _('One_Option_Correct')
         multiOption = 'M', _('Multu_Option_Correct')
         fill = 'F', _('Fill')
     parent_test = models.ForeignKey(Test, on_delete=models.CASCADE)
@@ -22,4 +22,5 @@ class Question(models.Model):
     image = models.ImageField(
         upload_to='material/question', blank=True, null=True)
     answer = models.TextField(blank=True)
+    marks = models.IntegerField(default=0)
     jsonChoices = models.TextField(blank=True)
