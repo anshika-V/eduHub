@@ -1,1 +1,2 @@
-daphne: daphne -b 127.0.0.1 -p 8000 eduHub.asgi:application
+web:  gunicorn eduHub.wsgi --log-file -
+web2: daphne eduHub.asgi:application
