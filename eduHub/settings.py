@@ -126,6 +126,10 @@ USE_TZ = True
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/create-test/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/instructor-portal/build/static/")
 ]
 
 STATIC_URL = '/static/'
