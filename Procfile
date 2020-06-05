@@ -1,1 +1,1 @@
-web2: daphne eduHub.asgi:application --log-file -
+web: daphne eduHub.asgi:application --log-file -
