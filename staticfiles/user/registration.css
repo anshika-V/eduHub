@@ -1,0 +1,26 @@
+#divForm {
+	margin: auto;
+	width: 50vw;
+	text-align: left;
+	box-shadow: 0.25vw 0.25vh 15px grey;
+}
+
+.form-control {
+	display: block;
+	width: 95%;
+	margin-left: 2px;
+}
+
+input {
+	display: block;
+}
+
+.helptext {
+	margin-left: 6px;
+}
+
+@media only screen and (max-width: 600px) {
+	#divForm {
+		width: 90%;
+	}
+}

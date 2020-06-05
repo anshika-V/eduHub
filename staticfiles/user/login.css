@@ -1,0 +1,56 @@
+#divForm {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+	background-color: transparent;
+	margin-bottom: 10vh;
+}
+
+#login-form {
+	width: auto;
+	min-width: 50vw;
+	max-width: 90vw;
+	margin: auto;
+	padding: 10px;
+	box-shadow: 0.25vw 0.25vh 15px grey;
+}
+
+input::placeholder {
+	font-size: large;
+}
+
+.form-control {
+	display: inline-block;
+	width: 25vw;
+	margin: auto;
+}
+
+#submit {
+	width: 8vw;
+	min-width: 75px;
+	margin-top: 1.5vh;
+	margin-bottom: 3vh;
+}
+
+input {
+	width: 22vw;
+}
+.errorlist {
+	color: red;
+	margin: auto;
+	width: 45vw;
+	padding-bottom: 1vh;
+}
+
+@media only screen and (max-width: 600px) {
+	#divForm {
+		margin-top: 12vh;
+	}
+	.form-control {
+		width: 90%;
+	}
+	input::placeholder {
+		text-align: center;
+	}
+}

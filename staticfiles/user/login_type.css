@@ -1,0 +1,95 @@
+#login-cont {
+	box-shadow: 0 4px 8px black;
+	max-width: 100vw;
+}
+
+#instructor-cont {
+	width: calc(40vw - 15px);
+	height: 50vh;
+	min-width: 200px;
+}
+
+#student-cont {
+	width: calc(40vw - 15px);
+	height: 50vh;
+	min-width: 200px;
+}
+
+.nav {
+	position: absolute;
+	top: 25px;
+	right: 25px;
+	display: block;
+}
+.nav li {
+	font-size: x-large;
+}
+
+.nav li a {
+	color: white;
+}
+.nav .button {
+	display: none;
+}
+
+#login {
+	margin-left: 10vw;
+}
+#footer {
+	margin-top: 25px;
+	min-height: 20vh;
+	z-index: 3;
+}
+
+@media only screen and (max-width: 450px) {
+	.display-2 {
+		font-size: 12vw;
+	}
+	.display-4 {
+		font-size: 8vw;
+	}
+	#login {
+	}
+	#student-cont {
+		height: auto;
+	}
+	#instructor-cont {
+		height: auto;
+	}
+	.nav {
+		top: 15px;
+		right: 15px;
+	}
+	.nav .link {
+		display: none;
+	}
+	.nav .button {
+		display: block;
+	}
+	.nav li {
+		animation: links-open 0.5s;
+	}
+	.close {
+		animation: links-close 0.5s;
+	}
+}
+
+@keyframes links-open {
+	from {
+		font-size: 0;
+	}
+	to {
+	}
+}
+@keyframes links-close {
+	from {
+		font-size: 100%;
+		opacity: 1;
+	}
+	to {
+		font-size: 0;
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+}
