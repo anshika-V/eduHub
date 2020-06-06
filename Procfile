@@ -1,1 +1,1 @@
-web: python manage.py runserver $PORT
+web: daphne eduHub.asgi:application
