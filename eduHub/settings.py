@@ -80,10 +80,19 @@ ASGI_APPLICATION = "eduHub.routing.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# Production database settings
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'eduHub',
+#     }
+# }
+
+# Default sqllite database settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'eduHub',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
