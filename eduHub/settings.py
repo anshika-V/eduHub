@@ -85,7 +85,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'eduHub',
     }
-    'CONN_MAX_AGE': 5,
 }
 
 
