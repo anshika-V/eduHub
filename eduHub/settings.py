@@ -129,7 +129,11 @@ STATICFILES_DIRS = [
     os.path.join(
         BASE_DIR, "material/templates/material/create-test/build/static/"),
     os.path.join(
-        BASE_DIR, "material/templates/material/instructor-portal/build/static/")
+        BASE_DIR, "material/templates/material/instructor-portal/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/student-test/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/check-test/build/static/")
 ]
 
 STATIC_URL = '/static/'
@@ -145,5 +149,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 LOGIN_URL = '/user/login/'
+LOGOUT_REDIRECT_URL = '/'
 
 django_heroku.settings(locals())
