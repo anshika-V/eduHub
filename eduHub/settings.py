@@ -147,9 +147,15 @@ STATICFILES_DIRS = [
 
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# for local dev server
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# for production
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+MEDIA_URL = 'https://eduhub.blob.core.windows.net/eduhub/'
+AZURE_CONTAINER = "eduhub"
+AZURE_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=eduhub;AccountKey=4++hvoSilZgiBN1u+cZrGXx0Wwocil4/yncVfy5XQQ4G0mmyxjvMa8x9bqPPMByPDUUUY0aXsbwbOtEtsbnJ+g==;EndpointSuffix=core.windows.net'
 
 # CORS settings for development
 CORS_ORIGIN_ALLOW_ALL = True
