@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '%_2x5(!4-gk%m4$4-m!&88y-d#d7_d9@)$dl7uqdzf%dd+u3q1'
-
+# SECRET_KEY = os.getenv('SECRET_KEY')   #for production
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -155,7 +155,7 @@ MEDIA_URL = '/media/'
 # DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 # MEDIA_URL = 'https://eduhub.blob.core.windows.net/eduhub/'
 # AZURE_CONTAINER = "eduhub"
-# AZURE_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=eduhub;AccountKey=4++hvoSilZgiBN1u+cZrGXx0Wwocil4/yncVfy5XQQ4G0mmyxjvMa8x9bqPPMByPDUUUY0aXsbwbOtEtsbnJ+g==;EndpointSuffix=core.windows.net'
+# AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
 
 # CORS settings for development
 CORS_ORIGIN_ALLOW_ALL = True
