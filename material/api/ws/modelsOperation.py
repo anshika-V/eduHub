@@ -34,6 +34,7 @@ class TestModelModifier:
         q = None
         if (ques['pk'] == None):
             q = Question(parent_test=self.test)
+            dic['code'] = 'SNQ'
         else:
             q = Question.objects.get(pk=ques['pk'])
         del ques['fields']['image']
