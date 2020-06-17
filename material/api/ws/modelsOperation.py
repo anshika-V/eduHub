@@ -3,41 +3,40 @@ import io
 
 
 class TestModelModifier:
-    test = None
-    user = None
 
     def __init__(self, **kwargs):
+        self.test = None
+        self.user = None
+        # Update class variables according to provided arguments
         self.__dict__.update(kwargs)
 
-    def initilize(self, key):
+    def initilize(self, key):  # initilizing self.test instance
         test = Test.objects.get(pk=key)
         if (test.instructor == self.user):
             self.test = test
             return ({'type': 'connected', 'code': 'is'})
         return({'type': 'error', 'code': 'is', 'message': 'initilization failed, unauthorised access'})
 
-    def testUpdate(self, payload):
+    def testUpdate(self, payload):  # update the test fields
         if (self.test == None):
             return ({'type': 'error', 'code': 'NI'})
-        print('payload:----------')
-        print(payload)
         self.test.__dict__.update(payload)
         self.test.save()
         return {'type': 'dataUploaded'}
 
-    def questionUpdate(self, ques):
+    def questionUpdate(self, ques):  # Update question fields
         if (self.test == None):
             return ({'type': 'error', 'code': 'NI'})
-        if (ques['fields']['parent_test'] != self.test.pk):
-            return({'type': 'error', 'code': 'UA', 'message': "Question dosen't belongs to the initilized test"})
         dic = {'type': 'saved', 'code': 'SQ'}
         q = None
-        if (ques['pk'] == None):
+        if (ques['pk'] == None):  # if new question
             q = Question(parent_test=self.test)
             dic['code'] = 'SNQ'
         else:
             q = Question.objects.get(pk=ques['pk'])
-        del ques['fields']['image']
+            if (q.parent_test != self.test):
+                return({'type': 'error', 'code': 'UA', 'message': "Question dosen't belongs to the initilized test"})
+        del ques['fields']['image']  # removing image from the data
         q.__dict__.update(ques['fields'])
         q.save()
         dic['key'] = q.pk
