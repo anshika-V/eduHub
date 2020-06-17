@@ -7,7 +7,7 @@ urlpatterns = [
     path('api/', include('user.api.urls')),
     path('login/', views.LoginType, name='login type'),
     path('login/student/', views.CustomLogin.as_view(success_url='/',
-                                                     type='S'), name="student login"),
+                                                     type='S'), name="student login"),  # update success url when student portal is done
     path('login/instructor/', views.CustomLogin.as_view(success_url='/material/instructor-portal/',
                                                         type='I'), name="instructor login"),
     path('logout/', LogoutView.as_view()),

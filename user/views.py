@@ -68,6 +68,8 @@ class ProfileUpdate(FormView):
         dic.update({'instance': self.instance})
         return dic
 
+# custom login view for both student and instructor
+
 
 class CustomLogin(LoginView):
     form_class = LoginForm
@@ -79,6 +81,7 @@ class CustomLogin(LoginView):
     def dispatch(self, request, *args, **kwargs):
         if (request.user.is_authenticated):
             if (self.type == request.user.profile.type):
+                # redirect authenticated user only if the type is matched otherwise show error
                 self.redirect_authenticated_user = True
             else:
                 self.redirect_authenticated_user = False
@@ -86,6 +89,7 @@ class CustomLogin(LoginView):
 
     def get_success_url(self):
         url = self.get_redirect_url()
+        # in case the login is aresult of requsting some other page and user is not authenticated then the success url will be the requested page
         return url or self.success_url
 
     def get(self, request, *args, **kwargs):
@@ -98,7 +102,7 @@ class CustomLogin(LoginView):
             user = form.get_user()
             if(user.profile.type == self.type):
                 return self.form_valid(form)
-            else:
+            else:  # incase the type is not matched show the erroe mxg and the login page for different typr
                 self.extra_context.update(
                     {'error_msg': ' try login with ' + user.profile.get_type_display() + ' login portal', 'type': user.profile.type})
                 return self.form_invalid(form)

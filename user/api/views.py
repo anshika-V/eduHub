@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.core import serializers
 import json
 
+
 @login_required
-def ProfileData(request):
+def ProfileData(request):  # send all profile data
     user = request.user
     profile = user.profile
     json_data = serializers.serialize('json', [profile])
