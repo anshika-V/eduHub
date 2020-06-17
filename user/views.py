@@ -16,12 +16,15 @@ def LoginType(request):
 def RegisterType(request):
     return render(request, 'user/register_type.html', {'title': 'Signup'})
 
+# Registration for user for type and other details go to urls
+
 
 class Register(FormView):
     form_class = UserRegistrationForm
     template_name = 'user/registration.html'
     extra_context = {'title': 'Sign Up'}
 
+    # overriding default methdod copied parent method statements also
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -32,27 +35,36 @@ class Register(FormView):
         else:
             return self.form_invalid(form)
 
+# To update profile for succes url and form initilization go to urls
+
 
 class ProfileUpdate(FormView):
     form_class = ProfileForm
-    success_url = '/'
     template_name = 'user/new_profile.html'
-    instance = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Instance variable so that every instance of this do not share the same value
+        self.instance = None
+        # Stores the instance of the users profile
 
     def get(self, request, *args, **kwargs):
+        # Saving users profile to the instance varoable got initializing form
         self.instance = request.user.profile
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        # Saving users profile to the instance varoable got initializing form
         self.instance = request.user.profile
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.save()
+        form.save()  # Saving received form data to database
         return super().form_valid(form)
 
     def get_form_kwargs(self):
         dic = super().get_form_kwargs()
+        # Sending instance data for form initilization
         dic.update({'instance': self.instance})
         return dic
 
