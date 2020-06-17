@@ -9,8 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%_2x5(!4-gk%m4$4-m!&88y-d#d7_d9@)$dl7uqdzf%dd+u3q1'
-# SECRET_KEY = os.getenv('SECRET_KEY')   #for production
+SECRET_KEY = os.getenv('SECRET_KEY')  # for production
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -26,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders', # remove for production
+    # 'corsheaders',  # remove for production
     'user',
     'home',
     'material',
@@ -34,7 +33,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', #remove for production
+    # 'corsheaders.middleware.CorsMiddleware',  # remove for production
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,20 +69,20 @@ ASGI_APPLICATION = "eduHub.routing.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 # Production database settings
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'eduHub',
-#     }
-# }
-
-# Default sqllite database settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'eduHub',
     }
 }
+
+# Default sqllite database settings
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
@@ -137,19 +136,19 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # for local dev server
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
 
 # for production
-# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-# MEDIA_URL = 'https://eduhub.blob.core.windows.net/eduhub/'
-# AZURE_CONTAINER = "eduhub"
-# AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+MEDIA_URL = 'https://eduhub.blob.core.windows.net/eduhub/'
+AZURE_CONTAINER = "eduhub"
+AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
 
 # CORS settings for development remove for production
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
 
 
 LOGIN_URL = '/user/login/'
