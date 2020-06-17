@@ -8,7 +8,8 @@
 {% block content %}
     <h1 class="display-2 title text-info">eduHub</h1>
     
-    <ui class="nav btn bg-primary d-flex flex-row p-0 m-0" id="nav">
+    {% comment %} top right nav bar {% endcomment %}
+    <ui class="nav btn bg-primary d-flex p-0 m-0" id="nav">
     <li class="button"><button class="material-icons btn btn-primary p-0 m-0" onclick="navDisp()">list</button></li>
     <li class="link"> <a href="/" class="badge ml-3 mr-3">Home</a> </li>
     <li class="link"> <a href= {% url 'register type' %} class="badge ml-3 mr-3">Register</a> </li>
@@ -24,29 +25,20 @@
 </div>
 <script>
 var nav = document.getElementById('nav');
-var login_cont = document.getElementById('login_cont');
-var inst = document.getElementById('instructor-cont');
-var stu  = document.getElementById('student_cont');
-if(screen.width < 450){
-    nav.classList.remove('flex-row');
-    nav.classList.add('flex-column');
-    login_cont.classList.remove('flex-row');
-    login_cont.classList.remove('align-items-center');
-    login_cont.classList.add('flex-column');
-    inst.classList.remove('m-4');
-    inst.classList.add('mt-2', 'ml-4');
-}
 
+//For responsive nav bar top right
 function navDisp(event){
     var q = document.querySelectorAll('.link');
     q.forEach((link, index)=>{
-        if(link.style.display=='none' || link.style.display == ''){
+        if( link.style.display == ''){  //opens and closes with animation
+            link.style.animationDuration='0.5s';
             link.style.animationName='';
             link.style.display = 'block';
         }
         else{
+            link.style.animationDuration='1s';  //Extra time to incorporat system lag animation is only of 0.5s
             link.style.animationName='links-close';
-            setTimeout(()=>link.style.display = 'none', 450); 
+            setTimeout(()=>link.style.display = '', 500); 
             }
     }
     )

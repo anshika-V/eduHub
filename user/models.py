@@ -4,8 +4,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
-
-# Create your models here.
+# profile of user
 
 
 class Profile(models.Model):
@@ -28,7 +27,7 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.first_name} Profile'
 
-
+# creates pofile of user whenever a new user is created
 @receiver(post_save, sender=User)
 def profileCreate(sender, **kwargs):
     if(kwargs['created']):

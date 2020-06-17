@@ -24,19 +24,23 @@
 </div >
 <! Animation end>
 
-<ui class="nav">
+{% comment %} Top nav bar {% endcomment %}
+<ui class="nav">   
     <li> <a href={% url 'register type' %} class="badge">Register</a> </li>
     <li> <a href={% url 'login type' %} class="badge">Login</a> </li>
-    <li> <a href="#" class="badge">Blog</a> </li>
-    <li> <a href="#" class="badge">Contact</a> </li>
+    <li> <a href="#" class="badge" style="opacity: 30%">Blog</a> </li>
+    <li> <a href="#" class="badge" style="opacity: 30%">Contact</a> </li>
 </ui>
 
 <h1 id="mainText" class="display-2"> eduHub </h1>
 <h1 id="mainTextShadow" class="display-2"> eduHub </h1>
 
-<div id="container" class="container p-2 d-flex flex-column">
+{% comment %} Main body div {% endcomment %}
+<div id="container" class="container p-2">
+This website is under development. The online test is functional. Report any bug or anything u don't like. 
 </div>
 
+{% comment %} Footer div bar {% endcomment %}
 <div id="footer" class="container-fluid bg-dark">
 </div>
 </div>

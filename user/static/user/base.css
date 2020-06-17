@@ -18,6 +18,7 @@ body::-webkit-scrollbar {
 	top: 25px;
 	right: 25px;
 	display: block;
+	flex-direction: row;
 }
 .nav li {
 	font-size: x-large;
@@ -46,18 +47,14 @@ body::-webkit-scrollbar {
 	.nav {
 		top: 15px;
 		right: 15px;
+		flex-direction: column;
 	}
 	.nav .link {
 		display: none;
-	}
-	.nav .button {
-		display: block;
-	}
-	.nav li {
 		animation: links-open 0.5s;
 	}
-	.close {
-		animation: links-close 0.5s;
+	.nav .button {
+		display: inline-block;
 	}
 }
 
@@ -69,14 +66,13 @@ body::-webkit-scrollbar {
 	}
 }
 @keyframes links-close {
-	from {
-		font-size: 100%;
-		opacity: 1;
+	0% {
 	}
-	to {
+
+	50% {
 		font-size: 0;
-		opacity: 0;
-		width: 0;
-		height: 0;
+	}
+	100% {
+		font-size: 0;
 	}
 }
