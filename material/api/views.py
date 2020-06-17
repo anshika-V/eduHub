@@ -78,7 +78,8 @@ def SaveTestResponse(request, key):  # Save the response of a student who submit
 @login_required
 def TestResponses(request, key):  # Summary data of a All The test response of a particular test
     test = Test.objects.get(pk=key)
-    if (test.instructor != user):  # Checking if requesting user is the instructor of the requested test
+    # Checking if requesting user is the instructor of the requested test
+    if (test.instructor != request.user):
         return HttpResponseForbidden('Unauthorised Access: You are not the instructor of requested test')
     res = test.testresult_set.all()
     data = serializers.serialize(
@@ -91,7 +92,7 @@ def TestResponseData(request, key):  # Test response data of a particular test r
     res = TestResult.objects.get(pk=key)
     test = res.parent_test
     # Checking if requesting user is the instructor of the requested test result test
-    if (test.instructor != user):
+    if (test.instructor != request.user):
         return HttpResponseForbidden('Unauthorised Access: You are not the instructor of requested test')
     data = serializers.serialize('json', [res])
     return HttpResponse(data, content_type='json_comment_filtered')
