@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from user.decorators import allow_instructor
 from django.core import serializers
 from django.shortcuts import render
-from material.models import Test, TestResult
+from material.models import Test, TestResult, TestSeries
 import json
 
 
@@ -22,8 +22,34 @@ def NewTest(request):  # form for creating new test, this is csrf safe af i am s
     return render(request, 'material/csrf_token.html')
 
 
+@csrf_exempt
+@login_required
+def NewTestSeries(request):  # form for creating new test series, this is csrf safe af i am sending csrf token can remove @csrf_exempt in production
+    if (request.method == 'POST'):
+        testSeries = TestSeries(instructor=request.user,
+                                title=request.POST['title'], description=request.POST['description'])
+        try:
+            testSeries.save()
+            return HttpResponse('success ' + str(testSeries.pk))
+        except:
+            pass
+    return render(request, 'material/csrf_token.html')
+
+
 @login_required  # Provides all data of the instructor dashboard add other data as the projects goes on
 def InstructorDashboardData(request):
+    user = request.user
+    testsObj = user.test_set.all()
+    testSeriesObjs = user.testseries_set.all()
+    data = {'tests': len(testsObj), 'courses': 0, 'blogs': 0,
+            'testSeries': len(testSeriesObjs)}
+    data = json.dumps(data)
+    return HttpResponse(data, content_type="json_comment_filtered")
+
+
+@login_required
+@allow_instructor
+def InstructorPortalTest(request):
     user = request.user
     testsObj = user.test_set.all()
     tests = serializers.serialize('json', testsObj)
@@ -33,7 +59,23 @@ def InstructorDashboardData(request):
         l = len(tes.testresult_set.all())
         tests[i]['attempts'] = l
         i = i+1
-    data = {'tests': tests}
+    data = json.dumps(tests)
+    return HttpResponse(data, content_type="json_comment_filtered")
+
+
+@login_required
+@allow_instructor
+def InstructorPortalTestSeries(request):
+    user = request.user
+    testSeriesObjs = user.testseries_set.all()
+    data = serializers.serialize(
+        'json', testSeriesObjs, fields=['title', 'time', 'access'])
+    data = json.loads(data)
+    i = 0
+    for d in data:
+        l = len(testSeriesObjs[i].testseriesresponse_set.all())
+        d['attempts'] = l
+        i += 1
     data = json.dumps(data)
     return HttpResponse(data, content_type="json_comment_filtered")
 
@@ -116,5 +158,16 @@ def DeleteTest(request, key=None):  # for deleting a test
     if request.method == 'POST':
         test = Test.objects.get(pk=key)
         test.delete()
+        return HttpResponse('success')
+    return HttpResponse('This test and all releated data will be deleted permanantly')
+
+
+@csrf_exempt  # Possibily Not secure make it in next iteration
+@login_required
+@allow_instructor
+def DeleteTestSeries(request, key=None):  # for deleting a testSeries
+    if request.method == 'POST':
+        testS = TestSeries.objects.get(pk=key)
+        testS.delete()
         return HttpResponse('success')
     return HttpResponse('This test and all releated data will be deleted permanantly')

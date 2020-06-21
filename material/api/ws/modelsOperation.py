@@ -1,4 +1,6 @@
 from material.models import Test, Question
+from django.core import serializers
+import json
 import io
 
 
@@ -10,11 +12,24 @@ class TestModelModifier:
         # Update class variables according to provided arguments
         self.__dict__.update(kwargs)
 
-    def initilize(self, key):  # initilizing self.test instance
-        test = Test.objects.get(pk=key)
+    # initilizing self.test instance also sending test data if the connection is for first time
+    def initilize(self, payload):
+        test = Test.objects.get(pk=payload['key'])
         if (test.instructor == self.user):
             self.test = test
-            return ({'type': 'connected', 'code': 'is'})
+            # test_initilized determines if teh ws is reconnecting means teh test at frontend has already been initilized
+            # if reconnecting then don't send test data
+            if (payload['test_initilized'] == 1):
+                return ({'type': 'connected', 'code': 'is'})
+            json_test_data = serializers.serialize(
+                'json', [test],  use_natural_foreign_keys=True)  # use_natural_foreign_key for sending actual name in place of pk
+            json_test_data = json.loads(json_test_data)[0]
+            questions = test.question_set.all()
+            question_data = serializers.serialize('json', questions)
+            question_data = json.loads(question_data)
+            # Adding all theh questions of the test in the response
+            json_test_data['questions'] = question_data
+            return ({'type': 'connected', 'code': 'is', 'testData': json_test_data})
         return({'type': 'error', 'code': 'is', 'message': 'initilization failed, unauthorised access'})
 
     def testUpdate(self, payload):  # update the test fields

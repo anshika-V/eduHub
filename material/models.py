@@ -26,9 +26,15 @@ class Question(models.Model):
         oneOption = 'O', _('One_Option_Correct')
         multiOption = 'M', _('Multu_Option_Correct')
         fill = 'F', _('Fill')
+        onOptionN = 'ON', _('One_Option_Correct_N')  # N fornegative marking
+        multiOptionN = 'MN', _('Multu_Option_Correct_N')
+        # P for partially correct
+        multiOptionP = 'MP', _('Multu_Option_Correct_P')
+        multiOptionNP = 'MNP', _('Multu_Option_Correct_NP')
+
     parent_test = models.ForeignKey(Test, on_delete=models.CASCADE)
     text = models.TextField()
-    type = models.CharField(max_length=1, choices=typeChoice.choices)
+    type = models.CharField(max_length=3, choices=typeChoice.choices)
     image = models.ImageField(
         upload_to='material/question', blank=True, null=True)
     answer = models.TextField(blank=True)
@@ -42,3 +48,24 @@ class TestResult(models.Model):
     questions = models.TextField()
     checked = models.BooleanField(default=False)
     time = models.DateTimeField(auto_now_add=True)
+
+
+class TestSeries(models.Model):
+    class AccessType(models.IntegerChoices):
+        public = 0, _('Public')
+        private = 1, _('Private')
+        paid = 2, _('Paid')
+    instructor = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=500)
+    description = models.TextField()
+    tests = models.ManyToManyField(Test, blank=True)
+    time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    access = models.IntegerField(default=0, choices=AccessType.choices)
+    accessKey = models.TextField(default='', blank=True)
+
+
+class TestSeriesResponse(models.Model):
+    parent_test_series = models.ForeignKey(
+        TestSeries, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    test_results = models.ManyToManyField(TestResult)

@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders', # remove for production
+    'corsheaders',  # remove for production
     'user',
     'home',
     'material',
@@ -34,7 +34,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', #remove for production
+    'corsheaders.middleware.CorsMiddleware',  # remove for production
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,7 +131,9 @@ STATICFILES_DIRS = [
     os.path.join(
         BASE_DIR, "material/templates/material/student-test/build/static/"),
     os.path.join(
-        BASE_DIR, "material/templates/material/check-test/build/static/")
+        BASE_DIR, "material/templates/material/check-test/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/instructor-portal-test/build/static/")
 ]
 # serving static files in development  Put all static files to azure container for production
 STATIC_URL = '/static/'

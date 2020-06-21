@@ -13,6 +13,12 @@ def InstructorPortal(request):
 
 @login_required
 @allow_instructor
+def InstructotPortalTest(request):
+    return render(request, 'material/instructor-portal-test/build/index.html')
+
+
+@login_required
+@allow_instructor
 def CreateTest(request, key):
     return render(request, 'material/create-test/build/index.html')
 
