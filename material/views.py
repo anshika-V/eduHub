@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from user.decorators import allow_instructor
-from .models import Test, TestResult
+from .models import Test, TestResult, TestSeries
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
 
 # Create your views here.
@@ -81,3 +81,21 @@ def TestResultStudent(request, key):
         # when requested pk is not found
         return HttpResponseBadRequest('Not Found')
     return render(request, 'material/test-result/build/index.html')
+
+
+@login_required
+def StudentTestSeries(request, key):
+    testS = TestSeries.objects.get(pk=int(key))
+    if (testS.access == 1):  # if access for test is private
+        dic = {'title': 'Private Test Series', 'testS_title': testS.title,
+               'instructor': testS.instructor.username}
+        if (request.method == 'POST'):
+            # Return the test page of user provides teh write access key
+            if (request.POST['key'] == testS.accessKey):
+                return render(request, 'material/student-test-series/build/index.html')
+            else:
+                # Error message for invalid access key
+                dic.update({'msga': 'Invalid Access Key'})
+        # page to write access key
+        return render(request, 'material/TestAuth.html', dic)
+    return render(request, 'material/student-test-series/build/index.html')

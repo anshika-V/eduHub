@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',  # remove for production
+    'rest_framework',
     'user',
     'home',
     'material',
@@ -140,6 +141,8 @@ STATICFILES_DIRS = [
         BASE_DIR, "material/templates/material/instructor-portal-testSeries/build/static/"),
     os.path.join(
         BASE_DIR, "material/templates/material/test-result/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/student-test-series/build/static/"),
 ]
 # serving static files in development  Put all static files to azure container for production
 STATIC_URL = '/static/'

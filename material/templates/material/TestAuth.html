@@ -7,7 +7,21 @@
 <div class="container-fluid" style="min-height: 65vh;">
 	<form method="POST">
     {% csrf_token %}
-    <h3 class="mt-4 mb-4">You are accessing a private test. Please enter the access key to continue</h3>
+    <h3 class="mt-4 mb-4">You are accessing a private test{%if testS_title %} series{%endif%}. Please enter the access key to continue</h3>
+    
+    {% if testS_title %}
+   
+    <table  class="bg-light table" style="font-size: 18px">
+    <tr>
+    <td>Test Title </td> <td>:</td> <td>{{testS_title}}</td>
+    </tr>
+    <tr>
+     <td>Instructor </td> <td>:</td>  <td>{{instructor}} </td>
+    </tr>
+   </table>
+   
+   {% else %}
+   
     <table  class="bg-light table" style="font-size: 18px">
     <tr>
     <td>Test Title </td> <td>:</td> <td>{{test_title}}</td>
@@ -16,9 +30,12 @@
      <td>Instructor </td> <td>:</td>  <td>{{instructor}} </td>
     </tr>
     <tr>
-     <td>Time </td> <td>:</td>  <td>{{time}} minutes </td>
+     <td>Time </td> <td>:</td>  <td>{%if time == -1%} no limit {%else%} {{time}} minutes{%endif%} </td>
     </tr>
    </table>
+   
+   {%endif%}
+   
    <div class="d-flex flex-row align-items-baseline m-auto" style="max-width: 500px;">
     <h6 class="mt-4" style="min-width: 100px">Access Key: </h6>
     <input type="text" class="form-control" name="key"/>

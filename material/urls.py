@@ -10,5 +10,6 @@ urlpatterns = [
     path('student-test/<int:key>/', views.StudentTest, name="student-test"),
     path('check-test/<int:key>/', views.CheckTest, name="check-test"),
     path('instructor-portal/test-series/', views.InstructorPortalTestSeries),
-    path('test-result/<int:key>/', views.TestResultStudent)
+    path('test-result/<int:key>/', views.TestResultStudent),
+    path('student-test-series/<int:key>/', views.StudentTestSeries)
 ]

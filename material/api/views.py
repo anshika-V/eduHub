@@ -1,10 +1,11 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from user.decorators import allow_instructor
 from django.core import serializers
 from django.shortcuts import render
 from material.models import Test, TestResult, TestSeries
+from .serializers import TestSeriesSerializer
 import json
 
 
@@ -212,9 +213,9 @@ def StudentTestSeriesData(request, key=None):
         testSeries = TestSeries.objects.get(pk=int(key))
     except:
         return HttpResponseNotFound('Error: test series not found')
-    json_testSeries_data = serializers.serialize(
-        'json', [testSeries])
-    return HttpResponse(json_testSeries_data, content_type='json_comment_filtered')
+    json_testSeries = TestSeriesSerializer(testSeries)
+    # dumps data into json striing and then sends it as response
+    return JsonResponse(json_testSeries.data)
 
 
 @csrf_exempt
