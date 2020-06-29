@@ -1,0 +1,40 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block stylesheet%}
+	
+{% endblock stylesheet %}
+{% block body %}
+<div class="container-fluid" style="min-height: 65vh;">
+	<form method="POST">
+    {% csrf_token %}
+    <h3 class="mt-4 mb-4">You are accessing a private test. Please enter the access key to continue</h3>
+    <table  class="bg-light table" style="font-size: 18px">
+    <tr>
+    <td>Test Title </td> <td>:</td> <td>{{test_title}}</td>
+    </tr>
+    <tr>
+     <td>Instructor </td> <td>:</td>  <td>{{instructor}} </td>
+    </tr>
+    <tr>
+     <td>Time </td> <td>:</td>  <td>{{time}} minutes </td>
+    </tr>
+   </table>
+   <div class="d-flex flex-row align-items-baseline m-auto" style="max-width: 500px;">
+    <h6 class="mt-4" style="min-width: 100px">Access Key: </h6>
+    <input type="text" class="form-control" name="key"/>
+    <br/>
+    </div>
+    <div class="text-center mt-3">
+    {% if msga %}
+    <h6 class="text-danger d-inline pl-4 pr-4 mb-2">{{msga}}</h6><br/>
+    {% endif %}
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+    </div>
+    </form>
+   
+</div>	
+{% endblock body %}
+
+
+
+

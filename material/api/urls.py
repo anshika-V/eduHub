@@ -13,5 +13,8 @@ urlpatterns = [
     path('test/responseData/<int:key>/', views.TestResponseData),
     path('test/responseData/checkSave/<int:key>/', views.CheckSaveTestResult),
     path('test/deleteTest/<int:key>/', views.DeleteTest),
-    path('testS/deleteTestSeries/<int:key>/', views.DeleteTestSeries)
+    path('testS/deleteTestSeries/<int:key>/', views.DeleteTestSeries),
+    path('testS/data/<int:key>/', views.CreateTestSeriesData),
+    path('testS/saveData/', views.SaveTestSeriesData),
+    path('student/test-series/<int:key>/', views.StudentTestSeriesData),
 ]

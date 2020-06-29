@@ -133,7 +133,13 @@ STATICFILES_DIRS = [
     os.path.join(
         BASE_DIR, "material/templates/material/check-test/build/static/"),
     os.path.join(
-        BASE_DIR, "material/templates/material/instructor-portal-test/build/static/")
+        BASE_DIR, "material/templates/material/instructor-portal-test/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/create-test-series/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/instructor-portal-testSeries/build/static/"),
+    os.path.join(
+        BASE_DIR, "material/templates/material/test-result/build/static/"),
 ]
 # serving static files in development  Put all static files to azure container for production
 STATIC_URL = '/static/'

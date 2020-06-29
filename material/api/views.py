@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from user.decorators import allow_instructor
@@ -41,7 +41,7 @@ def InstructorDashboardData(request):
     user = request.user
     testsObj = user.test_set.all()
     testSeriesObjs = user.testseries_set.all()
-    data = {'tests': len(testsObj), 'courses': 0, 'blogs': 0,
+    data = {'tests': len(testsObj), 'courses': 0, 'blogs': 0,  # length of all model obetcs owned by user
             'testSeries': len(testSeriesObjs)}
     data = json.dumps(data)
     return HttpResponse(data, content_type="json_comment_filtered")
@@ -52,11 +52,12 @@ def InstructorDashboardData(request):
 def InstructorPortalTest(request):
     user = request.user
     testsObj = user.test_set.all()
+    # all tests owned by the user
     tests = serializers.serialize('json', testsObj)
     tests = json.loads(tests)
     i = 0
     for tes in testsObj:
-        l = len(tes.testresult_set.all())
+        l = len(tes.testresult_set.all())  # all responses submitted by student
         tests[i]['attempts'] = l
         i = i+1
     data = json.dumps(tests)
@@ -67,12 +68,13 @@ def InstructorPortalTest(request):
 @allow_instructor
 def InstructorPortalTestSeries(request):
     user = request.user
-    testSeriesObjs = user.testseries_set.all()
+    testSeriesObjs = user.testseries_set.all()  # all test series owned by the user
     data = serializers.serialize(
         'json', testSeriesObjs, fields=['title', 'time', 'access'])
     data = json.loads(data)
     i = 0
     for d in data:
+        # all test series responses submited by student
         l = len(testSeriesObjs[i].testseriesresponse_set.all())
         d['attempts'] = l
         i += 1
@@ -171,3 +173,60 @@ def DeleteTestSeries(request, key=None):  # for deleting a testSeries
         testS.delete()
         return HttpResponse('success')
     return HttpResponse('This test and all releated data will be deleted permanantly')
+
+
+@login_required
+@allow_instructor
+# all data of a particular test series
+def CreateTestSeriesData(request, key=None):
+    user = request.user
+    testSeries = None
+    testObj = None
+    try:
+        testSeries = TestSeries.objects.get(pk=int(key))
+        testObj = user.test_set.all()
+    except:
+        return HttpResponseNotFound('Error: test series not found')
+    # Checking if requesting user is the instructor of the requested testSeries
+    if (testSeries.instructor != user):
+        return HttpResponseForbidden('Unauthorised Access: You are not the instructor of requested test')
+    json_testSeries_data = serializers.serialize(
+        'json', [testSeries])
+    json_test_list = serializers.serialize(
+        'json', testObj, use_natural_foreign_keys=True)
+    json_testSeries_data = json.loads(json_testSeries_data)
+    json_test_list = json.loads(json_test_list)
+    response_data = {'testSeries': json_testSeries_data[0],
+                     'testList': json_test_list}
+    response_data = json.dumps(response_data)
+    return HttpResponse(response_data, content_type='json_comment_filtered')
+
+
+@login_required
+@allow_instructor
+# all data of a particular test series for student portal
+def StudentTestSeriesData(request, key=None):
+    user = request.user
+    testSeries = None
+    try:
+        testSeries = TestSeries.objects.get(pk=int(key))
+    except:
+        return HttpResponseNotFound('Error: test series not found')
+    json_testSeries_data = serializers.serialize(
+        'json', [testSeries])
+    return HttpResponse(json_testSeries_data, content_type='json_comment_filtered')
+
+
+@csrf_exempt
+@login_required
+@allow_instructor
+def SaveTestSeriesData(request):
+    if (request.method == 'GET'):
+        return HttpResponseBadRequest('Invalid Request')
+    try:
+        data = serializers.deserialize('json', request.POST['data'])
+        for obj in data:
+            obj.save()
+    except:
+        return HttpResponseBadRequest('Invalid Request: Wrogly formatted data')
+    return HttpResponse('success')

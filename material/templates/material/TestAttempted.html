@@ -1,0 +1,25 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block stylesheet%}
+	
+{% endblock stylesheet %}
+{% block body %}
+<div class="container-fluid" style="min-height: 65vh;">
+    <h3 class="mt-4 mb-4">You have already attempted this test</h3>
+    <table  class="bg-light table" style="font-size: 18px">
+    <tr>
+    <td>Test Title </td> <td>:</td> <td>{{test_title}}</td>
+    </tr>
+    <tr>
+     <td>Instructor </td> <td>:</td>  <td>{{instructor}} </td>
+    </tr>
+    <tr>
+     <td>Result </td> <td>:</td>  <td><a href="/material/test-result/{{pk}}">click here</a></td>
+    </tr>
+   </table>
+</div>	
+{% endblock body %}
+
+
+
+
