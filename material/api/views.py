@@ -92,8 +92,8 @@ def AllTestData(request, key):  # Returns all data releated to a particular test
         test = Test.objects.get(pk=int(key))
     except:
         return HttpResponseNotFound('Error: test not found')
-    if (test.instructor != user):  # Checking if requesting user is the instructor of the requested test
-        return HttpResponseForbidden('Unauthorised Access: You are not the instructor of requested test')
+    # if (test.instructor != user):  # Checking if requesting user is the instructor of the requested test
+    #     return HttpResponseForbidden('Unauthorised Access: You are not the instructor of requested test')
     json_test_data = serializers.serialize(
         'json', [test],  use_natural_foreign_keys=True)
     json_test_data = json.loads(json_test_data)[0]
