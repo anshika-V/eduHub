@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from user.decorators import allow_instructor
 from .models import Test, TestResult, TestSeries
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
-
+from datetime import datetime
 # Create your views here.
 
 
@@ -41,7 +41,15 @@ def StudentTest(request, key):
     if (attempted):  # if already attempted return the page showing laready attempted
         dic = {'title': 'Result', 'test_title': test.title,
                'instructor': test.instructor.username, 'pk': testResults[0].pk}
-        return render(request, 'material/TestAttempted.html', dic)
+        if (test.duration != -1):
+            # timedalta difference of curenttime and time of test response
+            time_lapse = datetime.utcnow() - testResults.first().time.replace(tzinfo=None)
+            time_lapse_seconds = int(time_lapse.total_seconds())
+            # if more than the specified duration of test.duration has passed since test response object have been saved ot sice the student started the test
+            if (time_lapse_seconds > test.duration * 60):
+                return render(request, 'material/TestAttempted.html', dic)
+        else:
+            return render(request, 'material/TestAttempted.html', dic)
     if (test.access == 1):  # if access for test is private
         dic = {'title': 'Private Test', 'test_title': test.title,
                'instructor': test.instructor.username, 'time': test.duration}
