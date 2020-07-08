@@ -1,11 +1,14 @@
-from channels.generic.websocket import JsonWebsocketConsumer
+from django.core.files.storage import default_storage as storage
+from channels.generic.websocket import JsonWebsocketConsumer, AsyncJsonWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
+from channels.db import database_sync_to_async
 from .modelsOperation import TestModelModifier
 from mymodule.wsClient import JsonAsyncClient
 from material.models import Test, TestResult
 from django.core import serializers
 from datetime import datetime
 import json
+import io
 # WS consumer for Create test
 
 
@@ -39,7 +42,7 @@ class TestMaker(JsonWebsocketConsumer):
 
 
 # Make this socket secure it probably not secure at the moment
-class StudentTest(JsonWebsocketConsumer):
+class StudentTest(AsyncJsonWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -48,69 +51,98 @@ class StudentTest(JsonWebsocketConsumer):
         # model.TestResult object, the test result where the response of users test is saving
         self.test_result = None
         self.test_response_data = None  # parsed json data of test_result.question
+        self.fer_path = None  # path in the container where the image for fer is stored
+        self.fer = FerSocket()
 
-    def connect(self):  # Add websocket securities later
+    @database_sync_to_async
+    def getTestFromPk(self, pk):
+        test = Test.objects.get(pk=pk)
+        return test
+
+    @database_sync_to_async
+    def getTestResultsOfUser(self):
+        testResults = self.user.testresult_set.all().filter(parent_test=self.test)
+        attempted = testResults.exists()
+        if (attempted):
+            # loading test result to instance variable
+            self.test_result = testResults.first()
+        return attempted
+
+    @database_sync_to_async
+    def saveTestResult(self):
+        self.test_result.save()
+
+    @database_sync_to_async
+    def serialisedQuestionsOfTest(self):
+        questions = self.test.question_set.all()
+        question_data = serializers.serialize('json', questions)
+        return question_data
+
+    @database_sync_to_async
+    def serializeTest(self):
+        json_test = serializers.serialize(
+            'json', [self.test], use_natural_foreign_keys=True)
+        return json_test
+
+    async def connect(self):  # Add websocket securities later
         self.user = self.scope['user']
         if (not self.user.is_authenticated):  # implementation of @login_required
-            self.close()
+            await self.close()
             return
         test = None
         try:
-            test = Test.objects.get(
-                pk=self.scope['url_route']['kwargs']['test'])
+            test = await self.getTestFromPk(
+                self.scope['url_route']['kwargs']['test'])
+            print(test)
         except:
-            self.close()
+            await self.close()
             return
         self.test = test  # registering test to the class instance variable
-        testResults = self.user.testresult_set.all().filter(parent_test=test)
-        attempted = testResults.exists()
+        self.fer_path = 'analyser/' + self.user.username + '/' + test.title + '/'
+        attempted = await self.getTestResultsOfUser()
         if (attempted):  # if already attempted return the page showing laready attempted
             if (test.duration != -1):
                 # timedalta difference of curenttime and time of test response
-                time_lapse = datetime.utcnow() - testResults.first().time.replace(tzinfo=None)
+                time_lapse = datetime.utcnow() - self.test_result.time.replace(tzinfo=None)
                 time_lapse_seconds = int(time_lapse.total_seconds())
                 # if more than the specified duration of test.duration has passed since test response object have been saved ot sice the student started the test
                 if (time_lapse_seconds > test.duration * 60):
-                    self.close()
+                    await self.close()
                     return
                 else:  # reconnecting
-                    self.accept()
-                    self.test_result = testResults.first()
+                    await self.accept()
                     self.test_response_data = json.loads(
                         self.test_result.questions)
-                    json_test_data = serializers.serialize(
-                        'json', [test], use_natural_foreign_keys=True)
+                    json_test_data = await self.serializeTest()
                     json_test_data = json.loads(json_test_data)[0]
                     json_test_data['questions'] = self.test_response_data
                     json_test_data['startTime'] = str(self.test_result.time)
                     res = {'type': 'reconnected',
                            'TestData': json_test_data}
                     # sending test result data if reconnecting
-                    self.send_json(res)
+                    await self.send_json(res)
                     return
             else:
-                self.close()
+                await self.close()
                 return
-        self.accept()  # Accepting the connection and then sending all the test data
-        json_test_data = serializers.serialize(
-            'json', [test],  use_natural_foreign_keys=True)
+        await self.accept()  # Accepting the connection and then sending all the test data
+        json_test_data = await self.serializeTest()
         json_test_data = json.loads(json_test_data)[0]
-        questions = test.question_set.all()
-        question_data = serializers.serialize('json', questions)
+        question_data = await self.serialisedQuestionsOfTest()
         question_data = json.loads(question_data)
         # Adding all theh questions of the test in the response
         json_test_data['questions'] = question_data
         res = {'type': 'connected', 'TestData': json_test_data}
-        self.send_json(res)  # sending test data
+        await self.send_json(res)  # sending test data
         # storing test question data as it was sent to the react app for further saving it to Test Response
         self.test_response_data = question_data
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         if (self.test_result):
             self.test_result.questions = json.dumps(self.test_response_data)
-            self.test_result.save()
+            await self.saveTestResult()
 
-    def enterTest(self):
+    async def enterTest(self):
         res = {'type': 'data_received'}
         if(self.test_result == None):
             data = None
@@ -129,33 +161,41 @@ class StudentTest(JsonWebsocketConsumer):
             data = json.dumps(data)
             self.test_result = TestResult(
                 student=self.user, parent_test=self.test, questions=data)
-            self.test_result.save()
+            await self.saveTestResult()
         else:
             pass
-        self.send_json(res)
+        await self.send_json(res)
 
-    def questionUpdate(self, data, index):
+    async def questionUpdate(self, data, index):
         self.test_response_data[index].update(data)
-        self.send_json({'type': 'question_received'})
+        await self.send_json({'type': 'question_received'})
 
-    def submit(self, marks):
+    async def submit(self, marks):
         i = 0
         for question in self.test_response_data:
             question.update({'marks': marks[i]})
             i = i + 1
         self.test_result.questions = json.dumps(self.test_response_data)
-        self.test_result.save()
+        await self.saveTestResult()
         res = {'type': 'submitted'}
-        self.send_json(res)
+        await self.send_json(res)
 
-    def receive_json(self, content):
+    async def fer_image_save(self, payload):
+        image_data = io.BytesIO(bytearray(payload['image']))
+        storage.save(self.fer_path + payload['name'], image_data)
+        res = {'type': 'data_received'}
+        await self.send_json(res)
+
+    async def receive_json(self, content):
         try:
-            if (content['type'] == 'questionUpdate'):
-                self.questionUpdate(content['payload'], content['index'])
+            if (content['type'] == 'ferimage'):
+                await self.fer_image_save(content['payload'])
+            elif (content['type'] == 'questionUpdate'):
+                await self.questionUpdate(content['payload'], content['index'])
             elif (content['type'] == 'enter'):
-                self.enterTest()
+                await self.enterTest()
             elif (content['type'] == 'submit'):
-                self.submit(content['marks'])
+                await self.submit(content['marks'])
         except:
             pass
 
@@ -166,5 +206,5 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
         super().__init__(*args, **kwargs)
         self.ws = 'ws://fer.southeastasia.cloudapp.azure.com/'
 
-    def received_json():
+    async def received_json():
         pass
