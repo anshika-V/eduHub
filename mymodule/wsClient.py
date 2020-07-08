@@ -12,6 +12,7 @@ class AsyncBaseClient:
         self.__dict__.update(kwargs)
         self.loop = None
         self.which_loop = None
+        self.close = 0
 
     async def receiveCB(self):
         try:
@@ -41,6 +42,12 @@ class AsyncBaseClient:
         self.loop.call_soon_threadsafe(asyncio.create_task, self.receiveCB())
 
     async def send(self, data):  # subroutine to send data over socket
+        if (self.close == 1):
+            return
+        if (self.ws == None):
+            self.loop.call_soon_threadsafe(
+                self.loop.call_later, 2, self.loop.create_task, self.send(data))
+            return
         await self.ws.send(data)
 
     # subroutine to proporly disconnect the socket and put the class object to a stable state
@@ -53,6 +60,7 @@ class AsyncBaseClient:
             pass
         self.ws = None
         self.loop = None
+        self.close = 1
         print('Websocket: Disconnected')
 
     # abstract function which needs to be overeiden in the child call to do something with the received data

@@ -52,7 +52,7 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         self.test_result = None
         self.test_response_data = None  # parsed json data of test_result.question
         self.fer_path = None  # path in the container where the image for fer is stored
-        self.fer = FerSocket()
+        self.fer = None
 
     @database_sync_to_async
     def getTestFromPk(self, pk):
@@ -93,7 +93,6 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         try:
             test = await self.getTestFromPk(
                 self.scope['url_route']['kwargs']['test'])
-            print(test)
         except:
             await self.close()
             return
@@ -186,6 +185,18 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         res = {'type': 'data_received'}
         await self.send_json(res)
 
+    async def initilizeFER(self):
+        self.fer = FerSocket(path=self.fer_path)
+        await self.fer.connect()
+        await self.fer.send_json({'type': 'new', 'path': self.fer_path})
+        res = {'type': 'data_received'}
+        await self.send_json(res)
+
+    async def closeFER(self):
+        await self.fer.send_json({'type': 'close'})
+        await self.fer.disconnect()
+        self.fer = None  # test if the reference of class object is deleted or is still alive
+
     async def receive_json(self, content):
         try:
             if (content['type'] == 'ferimage'):
@@ -196,6 +207,10 @@ class StudentTest(AsyncJsonWebsocketConsumer):
                 await self.enterTest()
             elif (content['type'] == 'submit'):
                 await self.submit(content['marks'])
+            elif (content['type'] == 'initilizeFER'):
+                await self.initilizeFER()
+            elif (content['type'] == 'closeFER'):
+                await self.closeFER()
         except:
             pass
 
@@ -204,7 +219,16 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ws = 'ws://fer.southeastasia.cloudapp.azure.com/'
+        self.uri = 'ws://fer.southeastasia.cloudapp.azure.com/'
+        self.id = None
+        self.path = None
+        self.__dict__.update(kwargs)
 
-    async def received_json():
-        pass
+    async def received_json(self, data):
+        try:
+            if (data['type'] == 'new'):
+                self.id = data['id']
+            elif (data['type'] == 'closed'):
+                await self.disconnect()
+        except:
+            pass
