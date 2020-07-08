@@ -21,10 +21,11 @@ class AsyncBaseClient:
             self.loop.call_soon_threadsafe(
                 asyncio.create_task, self.receiveCB())  # register this function for loop's next iteration to keep connection alive and keep receiving
             await self.received(msg)  # call the received subroutine
-        except:     # most like this block will run if the socket is closed
-            print('Error while receiving from socket. Disconnecting ...')
-            # if socket is not closed the close it as there was something wrong in receiving also puts the class to a stanble state
-            await self.disconnect()
+        except:  # most like this block will run if the socket is closed
+            if(self.close == 0):
+                print('Error while receiving from socket. Disconnecting ...')
+                # if socket is not closed the close it as there was something wrong in receiving also puts the class to a stanble state
+                await self.disconnect()
 
     async def connect(self):
         try:
@@ -52,7 +53,9 @@ class AsyncBaseClient:
 
     # subroutine to proporly disconnect the socket and put the class object to a stable state
     async def disconnect(self):
-        if (self.which_loop):  # if loop is created by this module then close the loop
+        self.close = 1
+        # if loop is created by this module then close the loop
+        if (self.which_loop and loop.is_running()):
             self.loop.call_soon_threadsafe(self.loop.stop)
         try:
             await self.ws.close()
@@ -60,7 +63,6 @@ class AsyncBaseClient:
             pass
         self.ws = None
         self.loop = None
-        self.close = 1
         print('Websocket: Disconnected')
 
     # abstract function which needs to be overeiden in the child call to do something with the received data
@@ -84,7 +86,7 @@ class JsonAsyncClient(AsyncBaseClient):
     async def json_received_preprocessor(self, raw_data):
         data = None
         try:
-            data = json.load(raw_data)  # load the received json string
+            data = json.loads(raw_data)  # load the received json string
         except:
             print('ERROR: Error loading received data as json')
         if (data):

@@ -181,9 +181,17 @@ class StudentTest(AsyncJsonWebsocketConsumer):
 
     async def fer_image_save(self, payload):
         image_data = io.BytesIO(bytearray(payload['image']))
-        storage.save(self.fer_path + payload['name'], image_data)
+        file_name = storage.save(self.fer_path + payload['name'], image_data)
         res = {'type': 'data_received'}
         await self.send_json(res)
+        msg = {
+            'type': 'analyse',
+            'payload': {
+                'image': file_name,
+                'question_number': payload['question_number']
+            }
+        }
+        await self.fer.send_json()
 
     async def initilizeFER(self):
         self.fer = FerSocket(path=self.fer_path)
@@ -196,8 +204,11 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         await self.fer.send_json({'type': 'close'})
         await self.fer.disconnect()
         self.fer = None  # test if the reference of class object is deleted or is still alive
+        res = {'type': 'data_received'}
+        await self.send_json(res)
 
     async def receive_json(self, content):
+        print(content)
         try:
             if (content['type'] == 'ferimage'):
                 await self.fer_image_save(content['payload'])
@@ -219,7 +230,7 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.uri = 'ws://fer.southeastasia.cloudapp.azure.com/'
+        self.uri = 'ws://fer.southeastasia.cloudapp.azure.com/ws/analyser/'
         self.id = None
         self.path = None
         self.__dict__.update(kwargs)
