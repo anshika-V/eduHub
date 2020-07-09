@@ -178,6 +178,9 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         await self.saveTestResult()
         res = {'type': 'submitted'}
         await self.send_json(res)
+        if (self.fer):
+            self.fer.test_result = self.test_result
+            await self.fer.send_json({'type': 'noData'})
 
     async def fer_image_save(self, payload):
         image_data = io.BytesIO(bytearray(payload['image']))
@@ -185,19 +188,19 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         res = {'type': 'data_received'}
         await self.send_json(res)
         msg = {
-            'type': 'analyse',
+            'type': 'analyze',
             'payload': {
-                'image': file_name,
+                'image': payload['name'],
                 'question_number': payload['question_number']
             }
         }
-        await self.fer.send_json()
+        await self.fer.send_json(msg)
 
     async def initilizeFER(self):
         self.fer = FerSocket(path=self.fer_path)
         await self.fer.connect()
         await self.fer.send_json({'type': 'new', 'path': self.fer_path})
-        res = {'type': 'data_received'}
+        res = {'type': 'fer_ready'}
         await self.send_json(res)
 
     async def closeFER(self):
@@ -233,13 +236,26 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
         self.uri = 'ws://fer.southeastasia.cloudapp.azure.com/ws/analyser/'
         self.id = None
         self.path = None
+        self.test_result = None
         self.__dict__.update(kwargs)
 
+    @database_sync_to_async
+    def saveTestResult(self):
+        self.test_result.save()
+
     async def received_json(self, data):
+        print('received from fer')
+        print(data)
         try:
-            if (data['type'] == 'new'):
+            if (data['code'] == 'new'):
                 self.id = data['id']
-            elif (data['type'] == 'closed'):
+            elif (data['code'] == 'closed'):
                 await self.disconnect()
+            elif (data['code'] == 'result'):
+                self.test_result.fer_data = json.dumps(data['result'])
+                await self.saveTestResult()
+                await self.send_json({'type': 'close'})
+                await self.disconnect()
+
         except:
             pass

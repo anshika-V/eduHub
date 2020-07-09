@@ -49,7 +49,8 @@ class AsyncBaseClient:
             self.loop.call_soon_threadsafe(
                 self.loop.call_later, 2, self.loop.create_task, self.send(data))
             return
-        await self.ws.send(data)
+        self.loop.call_soon_threadsafe(
+            self.loop.create_task, self.ws.send(data))
 
     # subroutine to proporly disconnect the socket and put the class object to a stable state
     async def disconnect(self):
@@ -73,6 +74,8 @@ class AsyncBaseClient:
 class JsonAsyncClient(AsyncBaseClient):
 
     async def send_json(self, raw_data):  # process and send data over websocket
+        print('sending to fer:')
+        print(raw_data)
         data = None
         try:
             data = json.dumps(raw_data)  # stringify data to json strinig

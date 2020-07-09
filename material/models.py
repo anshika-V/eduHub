@@ -45,8 +45,8 @@ class Question(models.Model):
 class TestResult(models.Model):
     parent_test = models.ForeignKey(Test, on_delete=models.CASCADE)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    questions = models.TextField()
-    fer_data = models.TextField(default='')
+    questions = models.TextField(default='')
+    fer_data = models.TextField(default='[]')
     checked = models.BooleanField(default=False)
     time = models.DateTimeField(auto_now_add=True)
 
