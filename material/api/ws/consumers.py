@@ -1,5 +1,6 @@
 from django.core.files.storage import default_storage as storage
 from channels.generic.websocket import JsonWebsocketConsumer, AsyncJsonWebsocketConsumer
+from .AsyncDatabase import AsyncDatabase, AsyncDatabaseStudentTest
 from django.contrib.auth.models import AnonymousUser
 from channels.db import database_sync_to_async
 from .modelsOperation import TestModelModifier
@@ -42,7 +43,7 @@ class TestMaker(JsonWebsocketConsumer):
 
 
 # Make this socket secure it probably not secure at the moment
-class StudentTest(AsyncJsonWebsocketConsumer):
+class StudentTest(AsyncJsonWebsocketConsumer, AsyncDatabaseStudentTest):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,36 +54,6 @@ class StudentTest(AsyncJsonWebsocketConsumer):
         self.test_response_data = None  # parsed json data of test_result.question
         self.fer_path = None  # path in the container where the image for fer is stored
         self.fer = None
-
-    @database_sync_to_async
-    def getTestFromPk(self, pk):
-        test = Test.objects.get(pk=pk)
-        return test
-
-    @database_sync_to_async
-    def getTestResultsOfUser(self):
-        testResults = self.user.testresult_set.all().filter(parent_test=self.test)
-        attempted = testResults.exists()
-        if (attempted):
-            # loading test result to instance variable
-            self.test_result = testResults.first()
-        return attempted
-
-    @database_sync_to_async
-    def saveTestResult(self):
-        self.test_result.save()
-
-    @database_sync_to_async
-    def serialisedQuestionsOfTest(self):
-        questions = self.test.question_set.all()
-        question_data = serializers.serialize('json', questions)
-        return question_data
-
-    @database_sync_to_async
-    def serializeTest(self):
-        json_test = serializers.serialize(
-            'json', [self.test], use_natural_foreign_keys=True)
-        return json_test
 
     async def connect(self):  # Add websocket securities later
         self.user = self.scope['user']
@@ -139,7 +110,7 @@ class StudentTest(AsyncJsonWebsocketConsumer):
     async def disconnect(self, close_code):
         if (self.test_result):
             self.test_result.questions = json.dumps(self.test_response_data)
-            await self.saveTestResult()
+            await self.saveModelObject(self.test_result)
 
     async def enterTest(self):
         res = {'type': 'data_received'}
@@ -160,7 +131,7 @@ class StudentTest(AsyncJsonWebsocketConsumer):
             data = json.dumps(data)
             self.test_result = TestResult(
                 student=self.user, parent_test=self.test, questions=data)
-            await self.saveTestResult()
+            await self.saveModelObject(self.test_result)
         else:
             pass
         await self.send_json(res)
@@ -175,7 +146,7 @@ class StudentTest(AsyncJsonWebsocketConsumer):
             question.update({'marks': marks[i]})
             i = i + 1
         self.test_result.questions = json.dumps(self.test_response_data)
-        await self.saveTestResult()
+        await self.saveModelObject(self.test_result)
         res = {'type': 'submitted'}
         await self.send_json(res)
         if (self.fer):
@@ -229,7 +200,7 @@ class StudentTest(AsyncJsonWebsocketConsumer):
             pass
 
 
-class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicated server
+class FerSocket(JsonAsyncClient, AsyncDatabase):  # ws client module to connect to fer dedicated server
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -239,9 +210,6 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
         self.test_result = None
         self.__dict__.update(kwargs)
 
-    @database_sync_to_async
-    def saveTestResult(self):
-        self.test_result.save()
 
     async def received_json(self, data):
         print('received from fer')
@@ -253,7 +221,7 @@ class FerSocket(JsonAsyncClient):  # ws client module to connect to fer dedicate
                 await self.disconnect()
             elif (data['code'] == 'result'):
                 self.test_result.fer_data = json.dumps(data['result'])
-                await self.saveTestResult()
+                await self.saveModelObject(self.test_result)
                 await self.send_json({'type': 'close'})
                 await self.disconnect()
 
