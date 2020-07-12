@@ -116,6 +116,7 @@ class StudentTest(AsyncJsonWebsocketConsumer, AsyncDatabaseStudentTest):
         res = {'type': 'data_received'}
         if(self.test_result == None):
             data = None
+            # self.test_response_data is already initilized in connect method
             questions = self.test_response_data
             # subroutine to add answer and marks field to the question as done in the frontend react app
 
@@ -182,25 +183,32 @@ class StudentTest(AsyncJsonWebsocketConsumer, AsyncDatabaseStudentTest):
         await self.send_json(res)
 
     async def receive_json(self, content):
-        print(content)
         try:
             if (content['type'] == 'ferimage'):
+                print('fer_image received name = ')
+                print(content['payload']['name'])
                 await self.fer_image_save(content['payload'])
             elif (content['type'] == 'questionUpdate'):
+                print(content)
                 await self.questionUpdate(content['payload'], content['index'])
             elif (content['type'] == 'enter'):
+                print(content)
                 await self.enterTest()
             elif (content['type'] == 'submit'):
+                print(content)
                 await self.submit(content['marks'])
             elif (content['type'] == 'initilizeFER'):
+                print(content)
                 await self.initilizeFER()
             elif (content['type'] == 'closeFER'):
+                print(content)
                 await self.closeFER()
         except:
             pass
 
 
-class FerSocket(JsonAsyncClient, AsyncDatabase):  # ws client module to connect to fer dedicated server
+# ws client module to connect to fer dedicated server
+class FerSocket(JsonAsyncClient, AsyncDatabase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -209,7 +217,6 @@ class FerSocket(JsonAsyncClient, AsyncDatabase):  # ws client module to connect 
         self.path = None
         self.test_result = None
         self.__dict__.update(kwargs)
-
 
     async def received_json(self, data):
         print('received from fer')

@@ -45,7 +45,8 @@ class AsyncBaseClient:
     async def send(self, data):  # subroutine to send data over socket
         if (self.close == 1):
             return
-        if (self.ws == None):
+        if (self.ws == None):  # check every 2 seconds if socket is conected then send the data
+            print('Socket not connected scheduling messgage to be sent after 2 seconds')
             self.loop.call_soon_threadsafe(
                 self.loop.call_later, 2, self.loop.create_task, self.send(data))
             return
@@ -56,7 +57,7 @@ class AsyncBaseClient:
     async def disconnect(self):
         self.close = 1
         # if loop is created by this module then close the loop
-        if (self.which_loop and loop.is_running()):
+        if (self.which_loop and self.loop.is_running()):
             self.loop.call_soon_threadsafe(self.loop.stop)
         try:
             await self.ws.close()
